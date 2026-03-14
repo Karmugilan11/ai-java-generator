@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-import subprocess
+import requests
 
 app = FastAPI()
 
@@ -10,8 +10,14 @@ def home():
 @app.get("/generate")
 def generate(prompt: str):
 
-    command = f"ollama run deepseek-coder '{prompt}'"
+    url = "http://localhost:11434/api/generate"
 
-    result = subprocess.getoutput(command)
+    payload = {
+        "model": "deepseek-coder",
+        "prompt": prompt,
+        "stream": False
+    }
 
-    return {"response": result}
+    response = requests.post(url, json=payload)
+
+    return response.json()
