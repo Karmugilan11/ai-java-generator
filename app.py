@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 import requests
 import os
 
@@ -8,7 +9,7 @@ API_KEY = os.getenv("GROQ_API_KEY")
 
 @app.get("/")
 def home():
-    return {"message": "AI Code Assistant Running"}
+     return FileResponse("index.html")
 
 @app.get("/analyze")
 def analyze(code: str):
