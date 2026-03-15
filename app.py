@@ -1,5 +1,5 @@
-from fastapi import FastAPI
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, Request
+from fastapi.responses import FileResponse, JSONResponse
 import requests
 import os
 
@@ -9,12 +9,30 @@ API_KEY = os.getenv("GROQ_API_KEY")
 
 @app.get("/")
 def home():
-     return FileResponse("index.html")
+    return FileResponse("index.html")
 
-@app.get("/analyze")
-def analyze(code: str):
+@app.post("/chat")
+async def chat(request: Request):
 
-    prompt = f"Generate a Spring Boot skeleton project: {code}"
+    body = await request.json()
+    message = body.get("message")
+
+    if not message:
+        return JSONResponse({"error": "Message required"}, status_code=400)
+
+    if len(message) > 2000:
+        return JSONResponse({"error": "Message too large"}, status_code=400)
+
+    prompt = f"""
+You are a Java and Spring Boot expert.
+
+User request:
+{message}
+
+If user asks for code:
+- return clean formatted code
+- explain briefly
+"""
 
     try:
 
@@ -35,11 +53,11 @@ def analyze(code: str):
         data = response.json()
 
         if "error" in data:
-            return {"groq_error": data}
+            return {"error": data["error"]}
 
         return {
-            "ai_response": data["choices"][0]["message"]["content"]
+            "reply": data["choices"][0]["message"]["content"]
         }
 
     except Exception as e:
-        return {"server_error": str(e)}
+        return {"error": str(e)}
