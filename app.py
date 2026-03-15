@@ -23,7 +23,7 @@ def analyze(code:str):
     response = requests.post(
         "https://api.deepseek.com/v1/chat/completions",
         headers={
-            "Authorization": f"Bearer {API_KEY}",
+            "Authorization": f"Bearer {sk-ccb9eba3271f414ca80b7e5c3fc2bef9}",
             "Content-Type": "application/json"
         },
         json={
