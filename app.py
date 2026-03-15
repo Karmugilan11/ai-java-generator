@@ -4,7 +4,7 @@ import os
 
 app = FastAPI()
 
-API_KEY = os.getenv("DEEPSEEK_API_KEY")
+API_KEY = os.getenv("GROQ_API_KEY")
 
 @app.get("/")
 def home():
@@ -18,13 +18,13 @@ def analyze(code: str):
     try:
 
         response = requests.post(
-            "https://api.deepseek.com/v1/chat/completions",
+            "https://api.groq.com/openai/v1/chat/completions",
             headers={
                 "Authorization": f"Bearer {API_KEY}",
                 "Content-Type": "application/json"
             },
             json={
-                "model": "deepseek-chat",
+                "model": "llama3-70b-8192",
                 "messages": [
                     {"role": "user", "content": prompt}
                 ]
@@ -34,7 +34,7 @@ def analyze(code: str):
         data = response.json()
 
         if "error" in data:
-            return {"deepseek_error": data}
+            return {"groq_error": data}
 
         return {
             "ai_response": data["choices"][0]["message"]["content"]
