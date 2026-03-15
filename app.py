@@ -3,21 +3,33 @@ import requests
 
 app = FastAPI()
 
+API_KEY = "your_deepseek_api_key"
+
 @app.get("/")
 def home():
-    return {"message": "AI Java Generator Running"}
+    return {"message": "AI Code Assistant Running"}
 
-@app.get("/generate")
-def generate(prompt: str):
+@app.get("/analyze")
+def analyze(code:str):
 
-    url = "http://localhost:11434/api/generate"
+    prompt = f"""
+    Analyze the following code.
+    Find bugs and suggest corrections.
 
-    payload = {
-        "model": "deepseek-coder",
-        "prompt": prompt,
-        "stream": False
-    }
+    Code:
+    {code}
+    """
 
-    response = requests.post(url, json=payload)
+    response = requests.post(
+        "https://api.deepseek.com/v1/chat/completions",
+        headers={
+            "Authorization": f"Bearer {API_KEY}",
+            "Content-Type": "application/json"
+        },
+        json={
+            "model": "deepseek-coder",
+            "messages": [{"role": "user", "content": prompt}]
+        }
+    )
 
     return response.json()
