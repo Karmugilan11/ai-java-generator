@@ -4,7 +4,7 @@ import os
 
 app = FastAPI()
 
-API_KEY = os.getenv("sk-03903cf9888146fea4e9dd4dac5df5bb")
+API_KEY = os.getenv("DEEPSEEK_API_KEY")
 
 @app.get("/")
 def home():
@@ -33,7 +33,6 @@ def analyze(code: str):
 
         data = response.json()
 
-        # If API returned error
         if "error" in data:
             return {"deepseek_error": data}
 
