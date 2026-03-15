@@ -4,7 +4,7 @@ import os
 
 app = FastAPI()
 
-API_KEY = os.getenv("DEEPSEEK_API_KEY")
+API_KEY = os.getenv("sk-03903cf9888146fea4e9dd4dac5df5bb")
 
 @app.get("/")
 def home():
@@ -20,7 +20,7 @@ def analyze(code: str):
         response = requests.post(
             "https://api.deepseek.com/v1/chat/completions",
             headers={
-                "Authorization": f"Bearer {sk-03903cf9888146fea4e9dd4dac5df5bb}",
+                "Authorization": f"Bearer {API_KEY}",
                 "Content-Type": "application/json"
             },
             json={
