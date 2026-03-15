@@ -98,30 +98,30 @@ Created by Karmugilan ST
 
 async function send(){
 
-    const prompt = document.getElementById("prompt").value;
-    if(!prompt) return;
+const prompt = document.getElementById("prompt").value;
+if(!prompt) return;
 
-    const chat = document.getElementById("chat");
+const chat = document.getElementById("chat");
 
-    const userMsg = document.createElement("div");
-    userMsg.className="message user";
-    userMsg.innerText=prompt;
-    chat.appendChild(userMsg);
+const userMsg = document.createElement("div");
+userMsg.className="message user";
+userMsg.innerText=prompt;
+chat.appendChild(userMsg);
 
-    document.getElementById("prompt").value="";
+document.getElementById("prompt").value="";
 
-    const res = await fetch(
-      "https://ai-java-generator.onrender.com/generate?prompt="+encodeURIComponent(prompt)
-    );
+const res = await fetch(
+  "https://ai-java-generator.onrender.com/analyze?code="+encodeURIComponent(prompt)
+);
 
-    const data = await res.json();
+const data = await res.json();
 
-    const aiMsg = document.createElement("div");
-    aiMsg.className="message ai";
-    aiMsg.innerText = data.response || JSON.stringify(data);
-    chat.appendChild(aiMsg);
+const aiMsg = document.createElement("div");
+aiMsg.className="message ai";
+aiMsg.innerText = data.ai_response || JSON.stringify(data);
+chat.appendChild(aiMsg);
 
-    chat.scrollTop = chat.scrollHeight;
+chat.scrollTop = chat.scrollHeight;
 }
 
 </script>
