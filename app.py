@@ -1,35 +1,45 @@
 from fastapi import FastAPI
 import requests
+import os
 
 app = FastAPI()
 
-API_KEY = "your_deepseek_api_key"
+API_KEY = os.getenv("DEEPSEEK_API_KEY")
 
 @app.get("/")
 def home():
     return {"message": "AI Code Assistant Running"}
 
 @app.get("/analyze")
-def analyze(code:str):
+def analyze(code: str):
 
-    prompt = f"""
-    Analyze the following code.
-    Find bugs and suggest corrections.
+    prompt = f"Generate a Spring Boot skeleton project: {code}"
 
-    Code:
-    {code}
-    """
+    try:
 
-    response = requests.post(
-        "https://api.deepseek.com/v1/chat/completions",
-        headers={
-            "Authorization": f"Bearer {sk-ccb9eba3271f414ca80b7e5c3fc2bef9}",
-            "Content-Type": "application/json"
-        },
-        json={
-            "model": "deepseek-coder",
-            "messages": [{"role": "user", "content": prompt}]
+        response = requests.post(
+            "https://api.deepseek.com/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {API_KEY}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "model": "deepseek-chat",
+                "messages": [
+                    {"role": "user", "content": prompt}
+                ]
+            }
+        )
+
+        data = response.json()
+
+        # If API returned error
+        if "error" in data:
+            return {"deepseek_error": data}
+
+        return {
+            "ai_response": data["choices"][0]["message"]["content"]
         }
-    )
 
-    return response.json()
+    except Exception as e:
+        return {"server_error": str(e)}
