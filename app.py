@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse
 import requests
 import os
 
@@ -7,9 +7,13 @@ app = FastAPI()
 
 API_KEY = os.getenv("GROQ_API_KEY")
 
+# conversation memory
+conversation = []
+
 @app.get("/")
 def home():
     return FileResponse("index.html")
+
 
 @app.post("/chat")
 async def chat(request: Request):
@@ -18,21 +22,13 @@ async def chat(request: Request):
     message = body.get("message")
 
     if not message:
-        return JSONResponse({"error": "Message required"}, status_code=400)
+        return {"error": "message required"}
 
-    if len(message) > 2000:
-        return JSONResponse({"error": "Message too large"}, status_code=400)
-
-    prompt = f"""
-You are a Java and Spring Boot expert.
-
-User request:
-{message}
-
-If user asks for code:
-- return clean formatted code
-- explain briefly
-"""
+    # add user message to history
+    conversation.append({
+        "role": "user",
+        "content": message
+    })
 
     try:
 
@@ -44,9 +40,7 @@ If user asks for code:
             },
             json={
                 "model": "llama-3.1-8b-instant",
-                "messages": [
-                    {"role": "user", "content": prompt}
-                ]
+                "messages": conversation
             }
         )
 
@@ -55,9 +49,15 @@ If user asks for code:
         if "error" in data:
             return {"error": data["error"]}
 
-        return {
-            "reply": data["choices"][0]["message"]["content"]
-        }
+        reply = data["choices"][0]["message"]["content"]
+
+        # save AI reply
+        conversation.append({
+            "role": "assistant",
+            "content": reply
+        })
+
+        return {"reply": reply}
 
     except Exception as e:
         return {"error": str(e)}
