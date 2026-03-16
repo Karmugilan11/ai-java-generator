@@ -126,6 +126,7 @@ AI Spring Boot Developer Assistant
 <div id="inputBox">
 <input id="prompt" placeholder="Ask about Spring Boot, Java, or paste code..."/>
 <button onclick="send()">Send</button>
+<button onclick="resetChat()">Reset</button>
 </div>
 
 <footer>
@@ -137,6 +138,13 @@ Created by Karmugilan ST
 <script>
 
 const chat = document.getElementById("chat");
+
+let session_id = localStorage.getItem("ai_session_id");
+
+if(!session_id){
+    session_id = crypto.randomUUID();
+    localStorage.setItem("ai_session_id",session_id);
+}
 
 function addMessage(text,type){
 
@@ -170,7 +178,10 @@ method:"POST",
 headers:{
 "Content-Type":"application/json"
 },
-body:JSON.stringify({message:text})
+body:JSON.stringify({
+session_id:session_id,
+message:text
+})
 });
 
 const data = await res.json();
@@ -222,6 +233,22 @@ navigator.clipboard.writeText(code);
 el.innerText="Copied";
 
 setTimeout(()=>el.innerText="Copy",1500);
+
+}
+
+async function resetChat(){
+
+await fetch("/reset",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+session_id:session_id
+})
+});
+
+chat.innerHTML="";
 
 }
 
